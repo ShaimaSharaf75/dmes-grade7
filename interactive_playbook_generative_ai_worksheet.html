@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,19 +21,9 @@
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-        }
-
-        .badge-active {
-            background-color: #0284c7;
-            color: white;
-        }
-
-        .badge-inactive {
-            background-color: #f1f5f9;
-            color: #64748b;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.9);
         }
 
         /* Custom Scrollbar */
@@ -45,26 +35,32 @@
             background: #f1f5f9;
         }
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
+            background: #94a3b8;
             border-radius: 4px;
         }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
 
-        /* Drag and Drop Styling */
-        .draggable-item {
-            cursor: grab;
-            user-select: none;
-            transition: all 0.2s ease;
+        /* Style Card Selection for Artguru Module */
+        .style-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
         }
-        .draggable-item:active {
-            cursor: grabbing;
-            transform: scale(0.98);
+        .style-card:hover {
+            transform: translateY(-2px);
         }
-        .drop-zone {
-            transition: background-color 0.2s, border-color 0.2s;
-        }
-        .drop-zone.drag-over {
-            background-color: #e0f2fe;
+        .style-card.selected {
             border-color: #0284c7;
+            background-color: #f0f9ff;
+            ring: 2px;
+            ring-color: #0284c7;
+        }
+
+        /* Upload Area Drag & Drop Pulse */
+        .drop-zone--over {
+            border-color: #0284c7 !important;
+            background-color: #e0f2fe !important;
         }
 
         /* Printable styles for PDF fallback */
@@ -81,106 +77,136 @@
             }
             .glass-card {
                 box-shadow: none !important;
-                border: 1px solid #ccc !important;
+                border: 1px solid #cbd5e1 !important;
+                break-inside: avoid;
             }
         }
     </style>
 </head>
-<body class="min-h-screen pb-16">
+<body class="min-h-screen pb-20">
 
     <!-- TOP HEADER -->
-    <header class="gradient-header text-white sticky top-0 z-50 shadow-md">
+    <header class="gradient-header text-white sticky top-0 z-50 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <!-- School & Lesson Info -->
                 <div class="flex items-center space-x-3">
-                    <div class="bg-white p-2 rounded-xl shadow-inner text-sky-800 font-extrabold text-xl">
-                        <i class="fa-solid fa-robot text-2xl text-sky-600"></i>
+                    <div class="bg-white/10 backdrop-blur-md p-2.5 rounded-xl border border-white/20 text-sky-300 font-extrabold">
+                        <i class="fa-solid fa-wand-magic-sparkles text-2xl text-sky-400"></i>
                     </div>
                     <div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs bg-sky-500/30 text-sky-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-semibold">Dubai Modern Education School</span>
-                            <span class="text-xs bg-emerald-500/30 text-emerald-200 px-2.5 py-0.5 rounded-full font-semibold">AY 2026–2027</span>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-[10px] sm:text-xs bg-sky-500/30 text-sky-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-semibold border border-sky-400/30">
+                                Dubai Modern Education School
+                            </span>
+                            <span class="text-[10px] sm:text-xs bg-emerald-500/30 text-emerald-200 px-2.5 py-0.5 rounded-full font-semibold border border-emerald-400/30">
+                                AY 2026–2027
+                            </span>
                         </div>
-                        <h1 class="text-lg sm:text-xl font-bold tracking-tight">ICT Grade 7: Generative AI Playbook & Worksheet</h1>
+                        <h1 class="text-base sm:text-lg md:text-xl font-bold tracking-tight text-white mt-0.5">
+                            ICT Grade 7: Generative AI Interactive Worksheet
+                        </h1>
                     </div>
                 </div>
 
-                <!-- Global Action Controls -->
+                <!-- Global Controls -->
                 <div class="flex flex-wrap items-center gap-2 no-print">
-                    <button onclick="checkAllAnswers()" class="bg-sky-600 hover:bg-sky-500 text-white font-medium text-xs sm:text-sm px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shadow-sm">
+                    <button onclick="checkAllAnswers()" class="bg-sky-600 hover:bg-sky-500 text-white font-medium text-xs sm:text-sm px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
                         <i class="fa-solid fa-square-check"></i> Check Answers
                     </button>
-                    <button onclick="exportToPDF()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs sm:text-sm px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 shadow-md">
+                    <button onclick="exportToPDF()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs sm:text-sm px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow-md">
                         <i class="fa-solid fa-file-pdf"></i> Download PDF
                     </button>
-                    <button onclick="copySubmissionLink()" class="bg-slate-700 hover:bg-slate-600 text-slate-100 font-medium text-xs sm:text-sm px-3 py-2 rounded-lg transition-all flex items-center gap-1.5">
-                        <i class="fa-solid fa-link"></i> Classroom Link
+                    <button onclick="copySubmissionLink()" class="bg-slate-700 hover:bg-slate-600 text-slate-100 font-medium text-xs sm:text-sm px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-copy"></i> Copy Link
                     </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6" id="pdf-printable-area">
         
-        <!-- STUDENT IDENTITY & SCORE BAR -->
-        <div id="pdf-printable-area">
-            <div class="glass-card rounded-2xl p-4 sm:p-6 mb-6 shadow-sm border border-slate-200/80">
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                    
-                    <!-- Class & Student Input -->
-                    <div class="md:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Student Full Name *</label>
-                            <input type="text" id="studentName" oninput="updatePDFHeader()" placeholder="Enter your full name" 
-                                class="w-full bg-slate-50 border border-slate-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 rounded-lg px-3 py-2 text-sm text-slate-800 font-medium outline-none transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Student ID *</label>
-                            <input type="text" id="studentId" oninput="updatePDFHeader()" placeholder="e.g. ST-2026-789" 
-                                class="w-full bg-slate-50 border border-slate-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 rounded-lg px-3 py-2 text-sm text-slate-800 font-medium outline-none transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Grade 7 Section *</label>
-                            <select id="sectionSelect" onchange="updatePDFHeader()" class="w-full bg-slate-50 border border-slate-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 rounded-lg px-3 py-2 text-sm text-slate-800 font-bold outline-none transition">
-                                <option value="">Select Section</option>
-                                <option value="7A">Section 7A</option>
-                                <option value="7B">Section 7B</option>
-                                <option value="7C">Section 7C</option>
-                                <option value="7F">Section 7F</option>
-                                <option value="7G">Section 7G</option>
-                            </select>
+        <!-- STUDENT IDENTITY, AUTOMATIC TIMER & SCORE BAR -->
+        <div class="glass-card rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                
+                <!-- Class & Student Input -->
+                <div class="md:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Student Full Name *</label>
+                        <input type="text" id="studentName" oninput="handleStudentActivity()" placeholder="Enter your full name" 
+                            class="w-full bg-slate-50 border border-slate-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 rounded-xl px-3 py-2 text-sm text-slate-800 font-medium outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Student ID *</label>
+                        <input type="text" id="studentId" oninput="handleStudentActivity()" placeholder="e.g. ST-2026-789" 
+                            class="w-full bg-slate-50 border border-slate-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 rounded-xl px-3 py-2 text-sm text-slate-800 font-medium outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Grade 7 Section *</label>
+                        <select id="sectionSelect" onchange="handleStudentActivity()" class="w-full bg-slate-50 border border-slate-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 rounded-xl px-3 py-2 text-sm text-slate-800 font-bold outline-none transition">
+                            <option value="">Select Section</option>
+                            <option value="7A">Section 7A</option>
+                            <option value="7B">Section 7B</option>
+                            <option value="7C">Section 7C</option>
+                            <option value="7F">Section 7F</option>
+                            <option value="7G">Section 7G</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Mode Toggle & Overall Grade -->
+                <div class="md:col-span-4 flex flex-col justify-between items-end gap-2 border-t md:border-t-0 md:border-l border-slate-200 pt-3 md:pt-0 md:pl-5">
+                    <div class="w-full flex justify-between items-center no-print">
+                        <span class="text-xs font-bold text-slate-500">Differentiation Mode:</span>
+                        <div class="inline-flex rounded-lg bg-slate-200 p-0.5 text-xs font-semibold">
+                            <button onclick="setDiffMode('support')" id="btnDiffSupport" class="px-2.5 py-1 rounded-md text-slate-700 transition">Support</button>
+                            <button onclick="setDiffMode('standard')" id="btnDiffStandard" class="px-2.5 py-1 rounded-md bg-white text-sky-700 shadow-sm transition">Standard</button>
+                            <button onclick="setDiffMode('challenge')" id="btnDiffChallenge" class="px-2.5 py-1 rounded-md text-slate-700 transition">Challenge</button>
                         </div>
                     </div>
 
-                    <!-- Mode Toggle & Overall Grade -->
-                    <div class="md:col-span-4 flex flex-col sm:flex-row md:flex-col justify-between items-end gap-2 border-t md:border-t-0 md:border-l border-slate-200 pt-3 md:pt-0 md:pl-6">
-                        <div class="w-full flex justify-between items-center no-print">
-                            <span class="text-xs font-bold text-slate-500">Differentiation Mode:</span>
-                            <div class="inline-flex rounded-lg bg-slate-200 p-0.5 text-xs font-semibold">
-                                <button onclick="setDiffMode('support')" id="btnDiffSupport" class="px-2.5 py-1 rounded-md text-slate-700 transition">Support</button>
-                                <button onclick="setDiffMode('standard')" id="btnDiffStandard" class="px-2.5 py-1 rounded-md bg-white text-sky-700 shadow-sm transition">Standard</button>
-                                <button onclick="setDiffMode('challenge')" id="btnDiffChallenge" class="px-2.5 py-1 rounded-md text-slate-700 transition">Challenge</button>
-                            </div>
+                    <div class="w-full flex justify-between items-center bg-slate-100 rounded-xl p-2.5 border border-slate-200">
+                        <div>
+                            <div class="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Overall Score</div>
+                            <div class="text-lg font-black text-slate-800"><span id="totalScore">0</span> / <span id="maxScore">100</span> pts</div>
                         </div>
+                        <div id="gradeBadge" class="text-xs font-extrabold px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                            In Progress
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                        <div class="w-full flex justify-between items-center bg-slate-100 rounded-xl p-2.5 border border-slate-200">
-                            <div>
-                                <div class="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Overall Score</div>
-                                <div class="text-lg font-black text-slate-800"><span id="totalScore">0</span> / <span id="maxScore">100</span> pts</div>
-                            </div>
-                            <div id="gradeBadge" class="text-xs font-extrabold px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
-                                In Progress
-                            </div>
+            <!-- AUTOMATIC WORKSHEET TIMER & PROGRESS BAR BAR -->
+            <div class="mt-4 pt-3 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                
+                <!-- Auto Master Activity Timer -->
+                <div class="flex items-center gap-3 bg-slate-900 text-white px-4 py-2 rounded-xl shadow-inner w-full sm:w-auto">
+                    <div class="relative flex h-3 w-3">
+                        <span id="timerPulse" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span id="timerDot" class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </div>
+                    <div>
+                        <div class="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Activity Timer (Auto Active)</div>
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-clock text-sky-400 text-xs"></i>
+                            <span id="autoTimerDisplay" class="text-base font-black font-mono tracking-wider text-emerald-400">33:00</span>
+                            <span id="autoTimerStatus" class="text-[10px] text-slate-300 font-medium">(Running)</span>
                         </div>
+                    </div>
+                    <div class="ml-auto sm:ml-2 no-print">
+                        <button onclick="toggleMasterTimer()" id="btnMasterTimerToggle" title="Pause or Resume Timer" class="text-xs bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg border border-slate-700 text-slate-300">
+                            <i class="fa-solid fa-pause"></i>
+                        </button>
                     </div>
                 </div>
 
                 <!-- Progress Bar -->
-                <div class="mt-4 no-print">
+                <div class="w-full sm:flex-1">
                     <div class="flex justify-between items-center text-xs font-semibold text-slate-500 mb-1">
-                        <span>Worksheet Progress</span>
+                        <span>Worksheet Completion Progress</span>
                         <span id="progressPercentage">0% Completed</span>
                     </div>
                     <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
@@ -188,485 +214,680 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- NAVIGATION TABS -->
-            <div class="flex space-x-1 overflow-x-auto pb-2 mb-6 border-b border-slate-200 no-print">
-                <button onclick="showTab('step1')" id="tab-step1" class="tab-btn px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-semibold flex items-center gap-2 whitespace-nowrap bg-white border-t-2 border-sky-600 text-sky-600 shadow-sm">
-                    <span class="w-5 h-5 rounded-full bg-sky-100 text-sky-700 text-xs flex items-center justify-center font-bold">1</span>
-                    Entry Teaser (2m)
-                </button>
-                <button onclick="showTab('step2')" id="tab-step2" class="tab-btn px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-semibold flex items-center gap-2 whitespace-nowrap text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-                    <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-xs flex items-center justify-center font-bold">2</span>
-                    Do Now! Vocab (4m)
-                </button>
-                <button onclick="showTab('step3')" id="tab-step3" class="tab-btn px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-semibold flex items-center gap-2 whitespace-nowrap text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-                    <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-xs flex items-center justify-center font-bold">3</span>
-                    Teach & Concepts (10m)
-                </button>
-                <button onclick="showTab('step4')" id="tab-step4" class="tab-btn px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-semibold flex items-center gap-2 whitespace-nowrap text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-                    <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-xs flex items-center justify-center font-bold">4</span>
-                    Generative AI Art Lab (10m)
-                </button>
-                <button onclick="showTab('step5')" id="tab-step5" class="tab-btn px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-semibold flex items-center gap-2 whitespace-nowrap text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-                    <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-xs flex items-center justify-center font-bold">5</span>
-                    Ethics & Ownership (5m)
-                </button>
-                <button onclick="showTab('step6')" id="tab-step6" class="tab-btn px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-semibold flex items-center gap-2 whitespace-nowrap text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-                    <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-xs flex items-center justify-center font-bold">6</span>
-                    Exit Ticket (2m)
-                </button>
+        <!-- QUICK TOP-DOWN NAVIGATION BAR -->
+        <nav class="sticky top-[61px] z-40 bg-white/95 backdrop-blur-md rounded-2xl p-2 border border-slate-200 shadow-md no-print">
+            <div class="flex items-center justify-between overflow-x-auto text-xs font-semibold space-x-1 px-1">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2 whitespace-nowrap">Sections:</span>
+                <a href="#task-1" class="px-3 py-1.5 rounded-xl text-slate-700 hover:bg-sky-50 hover:text-sky-700 whitespace-nowrap transition flex items-center gap-1.5">
+                    <span class="w-4 h-4 rounded-full bg-sky-100 text-sky-800 text-[10px] font-bold flex items-center justify-center">1</span> Brain Teaser
+                </a>
+                <a href="#task-2" class="px-3 py-1.5 rounded-xl text-slate-700 hover:bg-sky-50 hover:text-sky-700 whitespace-nowrap transition flex items-center gap-1.5">
+                    <span class="w-4 h-4 rounded-full bg-sky-100 text-sky-800 text-[10px] font-bold flex items-center justify-center">2</span> Vocab
+                </a>
+                <a href="#task-3" class="px-3 py-1.5 rounded-xl text-slate-700 hover:bg-sky-50 hover:text-sky-700 whitespace-nowrap transition flex items-center gap-1.5">
+                    <span class="w-4 h-4 rounded-full bg-sky-100 text-sky-800 text-[10px] font-bold flex items-center justify-center">3</span> Concepts
+                </a>
+                <a href="#task-4" class="px-3 py-1.5 rounded-xl text-sky-700 bg-sky-50 font-bold whitespace-nowrap transition flex items-center gap-1.5">
+                    <span class="w-4 h-4 rounded-full bg-sky-600 text-white text-[10px] font-bold flex items-center justify-center">4</span> Artguru AI Lab
+                </a>
+                <a href="#task-5" class="px-3 py-1.5 rounded-xl text-slate-700 hover:bg-sky-50 hover:text-sky-700 whitespace-nowrap transition flex items-center gap-1.5">
+                    <span class="w-4 h-4 rounded-full bg-sky-100 text-sky-800 text-[10px] font-bold flex items-center justify-center">5</span> Ethics
+                </a>
+                <a href="#task-6" class="px-3 py-1.5 rounded-xl text-slate-700 hover:bg-sky-50 hover:text-sky-700 whitespace-nowrap transition flex items-center gap-1.5">
+                    <span class="w-4 h-4 rounded-full bg-sky-100 text-sky-800 text-[10px] font-bold flex items-center justify-center">6</span> Exit Ticket
+                </a>
+            </div>
+        </nav>
+
+        <!-- SECTION 1: LESSON ENTRY & BRAIN TEASER -->
+        <section id="task-1" class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div class="flex flex-wrap justify-between items-center mb-4 gap-2 border-b border-slate-100 pb-3">
+                <div class="flex items-center space-x-3">
+                    <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Task 1</span>
+                    <h2 class="text-xl font-bold text-slate-800">Lesson Entry: Brain Teaser</h2>
+                </div>
+                <!-- Section Timer Header -->
+                <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+                    <i class="fa-solid fa-stopwatch text-sky-600"></i>
+                    <span class="text-xs font-semibold text-slate-500">Allocated: 02:00</span>
+                    <span id="timer-1" class="text-sm font-black font-mono text-slate-800">02:00</span>
+                </div>
             </div>
 
-            <!-- PLAYBOOK CONTENT SECTIONS -->
+            <div class="bg-gradient-to-r from-sky-50 to-blue-50 border-l-4 border-sky-500 p-4 rounded-r-xl mb-4">
+                <p class="font-bold text-sky-950 text-base">Entry Brain Teaser Question:</p>
+                <p class="text-slate-700 text-sm mt-1">"Can a computer make brand-new art on its own, or is it just combining patterns it was trained on?"</p>
+            </div>
 
-            <!-- SECTION 1: LESSON ENTRY & BRAIN TEASER -->
-            <section id="step1" class="tab-content block">
-                <div class="glass-card rounded-2xl p-6 mb-6 shadow-sm border border-slate-200">
-                    <div class="flex flex-wrap justify-between items-center mb-4 gap-2 border-b border-slate-100 pb-3">
-                        <div class="flex items-center space-x-3">
-                            <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Task 1</span>
-                            <h2 class="text-xl font-bold text-slate-800">Lesson Entry: Brain Teaser</h2>
-                        </div>
-                        <!-- Section Timer Header -->
-                        <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
-                            <i class="fa-solid fa-stopwatch text-sky-600"></i>
-                            <span class="text-xs font-semibold text-slate-500">Allocated: 02:00</span>
-                            <span id="timer-1" class="text-sm font-black font-mono text-slate-800">02:00</span>
-                            <button onclick="toggleTimer(1, 120)" id="btn-timer-1" class="bg-sky-600 text-white text-xs px-2.5 py-1 rounded-lg font-medium hover:bg-sky-700 transition">
-                                Start Task
-                            </button>
-                        </div>
+            <div class="space-y-4">
+                <label class="block text-sm font-semibold text-slate-700">Write your initial hypothesis or opinion below:</label>
+                <textarea id="task1_response" rows="3" oninput="handleStudentActivity()" placeholder="Share your opinion here before we dive into today's lesson..."
+                    class="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-400 focus:border-sky-400 outline-none transition"></textarea>
+
+                <div class="flex items-center justify-between">
+                    <div class="text-xs text-slate-500 italic">Score contribution: 10 points for a complete initial response.</div>
+                    <button onclick="checkTask1()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition">
+                        Submit Initial Response
+                    </button>
+                </div>
+                <div id="task1_feedback" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: DO NOW VOCABULARY -->
+        <section id="task-2" class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div class="flex flex-wrap justify-between items-center mb-4 gap-2 border-b border-slate-100 pb-3">
+                <div class="flex items-center space-x-3">
+                    <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Task 2</span>
+                    <h2 class="text-xl font-bold text-slate-800">Do Now! Vocabulary Challenge: Live Critique</h2>
+                </div>
+                <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+                    <i class="fa-solid fa-stopwatch text-sky-600"></i>
+                    <span class="text-xs font-semibold text-slate-500">Allocated: 04:00</span>
+                    <span id="timer-2" class="text-sm font-black font-mono text-slate-800">04:00</span>
+                </div>
+            </div>
+
+            <!-- Task Context -->
+            <div class="mb-5 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <h3 class="text-sm font-bold text-slate-800 mb-1">Scenario: AI Art Prompt Output Review</h3>
+                <p class="text-xs text-slate-600">
+                    The teacher entered the prompt: <span class="font-mono bg-sky-100 text-sky-900 px-2 py-0.5 rounded font-semibold">"A dog playing basketball on the moon in cartoon style"</span>.
+                    Analyze the prompt output and construct your critique using the target terms: <strong>Claim</strong>, <strong>Assertion</strong>, and <strong>Viewpoint</strong>.
+                </p>
+            </div>
+
+            <!-- Vocabulary Terms Matching -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+                <!-- Term 1 -->
+                <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
+                    <span class="bg-indigo-100 text-indigo-800 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">Target Term 1</span>
+                    <h4 class="font-bold text-slate-800 text-base mt-1">Claim</h4>
+                    <p class="text-xs text-slate-500 mb-2">An unproven statement or representation made by the generator.</p>
+                    <select id="vocab_claim_match" onchange="handleStudentActivity()" class="w-full bg-slate-50 border border-slate-300 text-xs rounded-lg p-2 font-medium focus:ring-sky-400">
+                        <option value="">Match the example statement...</option>
+                        <option value="moon">"The AI system presents an image suggesting it depicted lunar gravity accurately."</option>
+                        <option value="artist">"From an artist's perspective, the vibrant cell-shaded colors are visually impressive."</option>
+                        <option value="wrong">"My strong opinion is that basketball bounce physics would never function on the moon."</option>
+                    </select>
+                </div>
+
+                <!-- Term 2 -->
+                <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
+                    <span class="bg-indigo-100 text-indigo-800 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">Target Term 2</span>
+                    <h4 class="font-bold text-slate-800 text-base mt-1">Assertion</h4>
+                    <p class="text-xs text-slate-500 mb-2">A confident statement of fact or strong belief regarding the output.</p>
+                    <select id="vocab_assertion_match" onchange="handleStudentActivity()" class="w-full bg-slate-50 border border-slate-300 text-xs rounded-lg p-2 font-medium focus:ring-sky-400">
+                        <option value="">Match the example statement...</option>
+                        <option value="moon">"The AI system presents an image suggesting it depicted lunar gravity accurately."</option>
+                        <option value="artist">"From an artist's perspective, the vibrant cell-shaded colors are visually impressive."</option>
+                        <option value="wrong">"My strong opinion is that basketball bounce physics would never function on the moon."</option>
+                    </select>
+                </div>
+
+                <!-- Term 3 -->
+                <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
+                    <span class="bg-indigo-100 text-indigo-800 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">Target Term 3</span>
+                    <h4 class="font-bold text-slate-800 text-base mt-1">Viewpoint</h4>
+                    <p class="text-xs text-slate-500 mb-2">A specific stance or perspective from which something is evaluated.</p>
+                    <select id="vocab_viewpoint_match" onchange="handleStudentActivity()" class="w-full bg-slate-50 border border-slate-300 text-xs rounded-lg p-2 font-medium focus:ring-sky-400">
+                        <option value="">Match the example statement...</option>
+                        <option value="moon">"The AI system presents an image suggesting it depicted lunar gravity accurately."</option>
+                        <option value="artist">"From an artist's perspective, the vibrant cell-shaded colors are visually impressive."</option>
+                        <option value="wrong">"My strong opinion is that basketball bounce physics would never function on the moon."</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Critique Builder -->
+            <div class="space-y-3">
+                <label class="block text-sm font-semibold text-slate-800">Combine these words into your own sentence critique:</label>
+                <textarea id="task2_sentence" rows="2" oninput="handleStudentActivity()" placeholder='e.g., "The system makes a claim that it drew the moon correctly, but my assertion is that gravity looks wrong. From an artist viewpoint..."'
+                    class="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-400 outline-none"></textarea>
+
+                <div class="flex items-center justify-between pt-1">
+                    <button onclick="toggleHint(2)" class="text-xs text-sky-600 hover:underline font-semibold flex items-center gap-1">
+                        <i class="fa-regular fa-lightbulb"></i> Need a Hint?
+                    </button>
+                    <button onclick="checkTask2()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition">
+                        Verify Vocabulary & Critique (15 pts)
+                    </button>
+                </div>
+                <div id="hint-2" class="hidden bg-amber-50 border border-amber-200 text-amber-800 text-xs p-3 rounded-xl">
+                    💡 <strong>Hint:</strong> Use 'Claim' for what the AI claims to depict, 'Assertion' for your definitive observation (e.g., gravity or fur detail), and 'Viewpoint' for an artist's or scientist's perspective.
+                </div>
+                <div id="task2_feedback" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: TEACH & CONCEPTS (ENLARGED SLIDE DECK FORMAT) -->
+        <section id="task-3" class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div class="flex flex-wrap justify-between items-center mb-4 gap-2 border-b border-slate-100 pb-3">
+                <div class="flex items-center space-x-3">
+                    <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Task 3</span>
+                    <h2 class="text-xl font-bold text-slate-800">Teach: Prompts, Patterns, and AI Art</h2>
+                </div>
+                <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+                    <i class="fa-solid fa-stopwatch text-sky-600"></i>
+                    <span class="text-xs font-semibold text-slate-500">Allocated: 10:00</span>
+                    <span id="timer-3" class="text-sm font-black font-mono text-slate-800">10:00</span>
+                </div>
+            </div>
+
+            <!-- INTERACTIVE LESSON SLIDE DECK -->
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 shadow-xl overflow-hidden mb-6 text-white">
+                <!-- Slide Navigation Header Bar -->
+                <div class="bg-slate-950 px-5 py-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-sky-500/20 text-sky-400 border border-sky-500/30 text-xs font-mono font-bold px-2.5 py-1 rounded-md">
+                            SLIDE PRESENTATION MODE
+                        </span>
+                        <span id="slideCounterBadge" class="text-xs text-slate-400 font-semibold">Slide 1 of 4</span>
                     </div>
 
-                    <div class="bg-gradient-to-r from-sky-50 to-blue-50 border-l-4 border-sky-500 p-4 rounded-r-xl mb-5">
-                        <p class="font-bold text-sky-950 text-base">Entry Brain Teaser Question:</p>
-                        <p class="text-slate-700 text-sm mt-1">"Can a computer make brand-new art on its own, or is it just combining patterns it was trained on?"</p>
-                    </div>
-
-                    <div class="space-y-4">
-                        <label class="block text-sm font-semibold text-slate-700">Write your hypothesis / initial thoughts below:</label>
-                        <textarea id="task1_response" rows="3" oninput="saveProgress()" placeholder="Share your opinion here before we dive into today's lesson..."
-                            class="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-400 focus:border-sky-400 outline-none transition"></textarea>
-
-                        <div class="flex items-center justify-between">
-                            <div class="text-xs text-slate-500 italic">Score contribution: 10 points for thoughtful response.</div>
-                            <button onclick="checkTask1()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
-                                Submit Initial Response
-                            </button>
-                        </div>
-                        <div id="task1_feedback" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+                    <!-- Slide Navigation Tabs -->
+                    <div class="flex items-center space-x-1 overflow-x-auto text-xs">
+                        <button onclick="goToTeachSlide(1)" id="slideTab1" class="px-3 py-1.5 rounded-lg font-bold transition bg-sky-600 text-white shadow">1. What is Gen AI</button>
+                        <button onclick="goToTeachSlide(2)" id="slideTab2" class="px-3 py-1.5 rounded-lg font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800">2. Prompting Formula</button>
+                        <button onclick="goToTeachSlide(3)" id="slideTab3" class="px-3 py-1.5 rounded-lg font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800">3. How AI Works</button>
+                        <button onclick="goToTeachSlide(4)" id="slideTab4" class="px-3 py-1.5 rounded-lg font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800">4. Ethics & Copyright</button>
                     </div>
                 </div>
-            </section>
 
-            <!-- SECTION 2: DO NOW VOCABULARY -->
-            <section id="step2" class="tab-content hidden">
-                <div class="glass-card rounded-2xl p-6 mb-6 shadow-sm border border-slate-200">
-                    <div class="flex flex-wrap justify-between items-center mb-4 gap-2 border-b border-slate-100 pb-3">
-                        <div class="flex items-center space-x-3">
-                            <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Task 2</span>
-                            <h2 class="text-xl font-bold text-slate-800">Do Now! Vocabulary Challenge: Live Critique</h2>
+                <!-- Slide Content Viewport -->
+                <div class="p-6 sm:p-8 min-h-[340px] flex flex-col justify-between">
+                    
+                    <!-- SLIDE 1: Generative AI Overview -->
+                    <div id="teachSlide1" class="teach-slide-content space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center text-2xl font-bold">
+                                <i class="fa-solid fa-brain"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs text-sky-400 uppercase font-mono font-bold tracking-wider">Lesson Concept 01</span>
+                                <h3 class="text-xl sm:text-2xl font-extrabold text-white">What is Generative Artificial Intelligence?</h3>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
-                            <i class="fa-solid fa-stopwatch text-sky-600"></i>
-                            <span class="text-xs font-semibold text-slate-500">Allocated: 04:00</span>
-                            <span id="timer-2" class="text-sm font-black font-mono text-slate-800">04:00</span>
-                            <button onclick="toggleTimer(2, 240)" id="btn-timer-2" class="bg-sky-600 text-white text-xs px-2.5 py-1 rounded-lg font-medium hover:bg-sky-700 transition">
-                                Start Task
-                            </button>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Unlike traditional software or search engines that simply retrieve saved files, <strong>Generative AI</strong> uses complex neural models trained on billions of existing images and text. It learns underlying patterns to construct brand new artwork, code, or written content from scratch.
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700/80">
+                                <h4 class="font-bold text-sky-300 text-sm mb-1"><i class="fa-solid fa-magnifying-glass text-xs mr-1"></i> Search Engine (e.g. Google)</h4>
+                                <p class="text-xs text-slate-400">Finds and links to artwork that human artists have already created and saved on the web.</p>
+                            </div>
+                            <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700/80">
+                                <h4 class="font-bold text-emerald-300 text-sm mb-1"><i class="fa-solid fa-wand-magic-sparkles text-xs mr-1"></i> Generative AI (e.g. Artguru)</h4>
+                                <p class="text-xs text-slate-400">Synthesizes brand new pixels pixel-by-pixel based on patterns it learned during training.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Task Context -->
-                    <div class="mb-5 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <h3 class="text-sm font-bold text-slate-800 mb-2">Scenario: AI Art Prompt Output Review</h3>
-                        <p class="text-xs text-slate-600 mb-3">
-                            The teacher entered the prompt: <span class="font-mono bg-sky-100 text-sky-900 px-2 py-0.5 rounded font-semibold">"A dog playing basketball on the moon in cartoon style"</span>.
-                            Analyze the prompt output and construct your critique using the target terms: <strong>Claim</strong>, <strong>Assertion</strong>, and <strong>Viewpoint</strong>.
+                    <!-- SLIDE 2: Prompting Formula -->
+                    <div id="teachSlide2" class="teach-slide-content hidden space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-2xl font-bold">
+                                <i class="fa-solid fa-terminal"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs text-indigo-400 uppercase font-mono font-bold tracking-wider">Lesson Concept 02</span>
+                                <h3 class="text-xl sm:text-2xl font-extrabold text-white">The Artguru AI Prompting Formula</h3>
+                            </div>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Generative AI tools rely on clear, descriptive instructions. Vague inputs like <code class="bg-slate-800 text-pink-300 px-2 py-0.5 rounded font-mono text-xs">"a dog"</code> produce unpredictable results. To get precise outputs, use the 3-part formula:
+                        </p>
+                        <div class="bg-gradient-to-r from-slate-800 via-indigo-950 to-slate-800 p-4 rounded-xl border border-indigo-500/30 text-center font-mono text-xs sm:text-sm text-sky-200">
+                            [ Clear Subject ] + [ Art Style / Medium ] + [ Lighting & Color Details ]
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 text-xs">
+                            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700">
+                                <span class="font-bold text-indigo-400 block mb-0.5">1. Subject</span>
+                                <span class="text-slate-300">"An astronaut playing electric guitar on Mars"</span>
+                            </div>
+                            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700">
+                                <span class="font-bold text-indigo-400 block mb-0.5">2. Art Style</span>
+                                <span class="text-slate-300">"80s synthwave neon, cyberpunk digital art"</span>
+                            </div>
+                            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700">
+                                <span class="font-bold text-indigo-400 block mb-0.5">3. Lighting & Details</span>
+                                <span class="text-slate-300">"Dramatic rim lighting, glowing purple dust"</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 3: How AI Synthesizes Art -->
+                    <div id="teachSlide3" class="teach-slide-content hidden space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-2xl font-bold">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs text-emerald-400 uppercase font-mono font-bold tracking-wider">Lesson Concept 03</span>
+                                <h3 class="text-xl sm:text-2xl font-extrabold text-white">How AI Models Synthesize Images</h3>
+                            </div>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Image models (like Diffusion systems) start with a screen full of completely random visual noise (like television static). They gradually remove the noise step-by-step, shaping the pixels to match the patterns associated with the words in your text prompt.
+                        </p>
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-2 bg-slate-800/80 p-4 rounded-xl border border-slate-700 text-xs text-slate-300">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center font-bold text-sky-400">1</span>
+                                <span>Random Pixel Static</span>
+                            </div>
+                            <i class="fa-solid fa-arrow-right text-slate-500 hidden sm:block"></i>
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center font-bold text-sky-400">2</span>
+                                <span>Noise Reduction Pass</span>
+                            </div>
+                            <i class="fa-solid fa-arrow-right text-slate-500 hidden sm:block"></i>
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold">3</span>
+                                <span>Detailed High-Res Canvas</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 4: Ethics, Copyright & Fairness -->
+                    <div id="teachSlide4" class="teach-slide-content hidden space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-2xl font-bold">
+                                <i class="fa-solid fa-scale-balanced"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs text-amber-400 uppercase font-mono font-bold tracking-wider">Lesson Concept 04</span>
+                                <h3 class="text-xl sm:text-2xl font-extrabold text-white">Ethics, Copyright & Fairness in AI Art</h3>
+                            </div>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Because AI models learn from human artwork, serious ethical and legal questions arise regarding artist copyright, original creativity, and ownership of computer-generated images.
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700">
+                                <h4 class="font-bold text-amber-300 mb-1"><i class="fa-solid fa-copyright mr-1"></i> Copyright & Artist Rights</h4>
+                                <p class="text-slate-400">Many artists argue that training AI on their artwork without consent or compensation is unfair.</p>
+                            </div>
+                            <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700">
+                                <h4 class="font-bold text-sky-300 mb-1"><i class="fa-solid fa-user-shield mr-1"></i> Responsible AI Usage</h4>
+                                <p class="text-slate-400">Always give credit when presenting AI-generated work and avoid impersonating living artists directly.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide Controller Buttons -->
+                    <div class="pt-6 border-t border-slate-800/80 flex items-center justify-between">
+                        <button onclick="changeTeachSlide(-1)" id="btnPrevSlide" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition flex items-center gap-2 opacity-50 cursor-not-allowed" disabled>
+                            <i class="fa-solid fa-arrow-left"></i> Previous Slide
+                        </button>
+                        <div class="flex gap-1.5" id="slideDotsContainer">
+                            <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-700"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-700"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-700"></span>
+                        </div>
+                        <button onclick="changeTeachSlide(1)" id="btnNextSlide" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs transition flex items-center gap-2 shadow-md">
+                            Next Slide <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Concept Quiz Check -->
+            <div class="border-t border-slate-200 pt-4">
+                <h3 class="font-bold text-slate-800 text-sm mb-3">Concept Check Quiz:</h3>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-700 mb-1">Q1: Which formula yields the most predictable, high-quality image output from a Generative AI tool?</p>
+                        <div class="space-y-1.5 text-xs">
+                            <label class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                                <input type="radio" name="q_concept1" value="a" onchange="handleStudentActivity()" class="text-sky-600">
+                                <span>A single vague word like "cat" or "car"</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                                <input type="radio" name="q_concept1" value="b" onchange="handleStudentActivity()" class="text-sky-600">
+                                <span>[Subject] + [Art Style] + [Lighting & Color details]</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                                <input type="radio" name="q_concept1" value="c" onchange="handleStudentActivity()" class="text-sky-600">
+                                <span>Asking the computer to guess what you want without typing</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-semibold text-slate-700 mb-1">Q2: How does a diffusion or generative image model construct new artwork?</p>
+                        <div class="space-y-1.5 text-xs">
+                            <label class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                                <input type="radio" name="q_concept2" value="a" onchange="handleStudentActivity()" class="text-sky-600">
+                                <span>By copying and pasting pre-made Google images directly</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                                <input type="radio" name="q_concept2" value="b" onchange="handleStudentActivity()" class="text-sky-600">
+                                <span>By synthesizing new patterns learned from vast training datasets</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button onclick="checkTask3()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition">
+                            Verify Concept Quiz (15 pts)
+                        </button>
+                    </div>
+                    <div id="task3_feedback" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: GENERATIVE AI ART LAB WITH DIRECT ARTGURU AI LAUNCHER & ATTACHMENT -->
+        <section id="task-4" class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div class="flex flex-wrap justify-between items-center mb-4 gap-2 border-b border-slate-100 pb-3">
+                <div class="flex items-center space-x-3">
+                    <span class="bg-sky-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">Task 4</span>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-xl font-extrabold text-slate-800">Generative AI Art Lab</h2>
+                        <span class="bg-gradient-to-r from-sky-600 to-indigo-600 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                            Artguru AI Module
+                        </span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+                    <i class="fa-solid fa-stopwatch text-sky-600"></i>
+                    <span class="text-xs font-semibold text-slate-500">Allocated: 10:00</span>
+                    <span id="timer-4" class="text-sm font-black font-mono text-slate-800">10:00</span>
+                </div>
+            </div>
+
+            <!-- Artguru Launch Studio Hero Banner -->
+            <div class="bg-gradient-to-r from-sky-950 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl mb-6 shadow-xl border border-slate-800 relative overflow-hidden">
+                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
+                    <div class="space-y-2 max-w-2xl">
+                        <div class="inline-flex items-center gap-2 bg-sky-500/20 text-sky-300 border border-sky-400/30 px-3 py-1 rounded-full text-xs font-bold">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Direct Studio Launcher
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight">
+                            Launch Artguru AI Generator & Create Your Artwork
+                        </h3>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Draft your structured prompt below, launch <a href="https://www.artguru.ai/ai-text-to-image-generator/" target="_blank" class="text-sky-300 font-bold underline hover:text-sky-200">Artguru.ai</a>, generate your custom image, download it, and attach your file to complete this worksheet!
                         </p>
                     </div>
 
-                    <!-- Interactive Drag/Match Vocabulary Terms -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <!-- Term 1 -->
-                        <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
-                            <span class="bg-indigo-100 text-indigo-800 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">Target Term 1</span>
-                            <h4 class="font-bold text-slate-800 text-base mt-1">Claim</h4>
-                            <p class="text-xs text-slate-500 mb-2">An unproven statement or representation made by the generator.</p>
-                            <select id="vocab_claim_match" onchange="saveProgress()" class="w-full bg-slate-50 border border-slate-300 text-xs rounded-lg p-2 font-medium focus:ring-sky-400">
-                                <option value="">Match the example statement...</option>
-                                <option value="moon">"The AI system presents an image suggesting it depicted lunar gravity accurately."</option>
-                                <option value="artist">"From an artist's perspective, the vibrant cell-shaded colors are visually impressive."</option>
-                                <option value="wrong">"My strong opinion is that basketball bounce physics would never function on the moon."</option>
-                            </select>
-                        </div>
-
-                        <!-- Term 2 -->
-                        <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
-                            <span class="bg-indigo-100 text-indigo-800 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">Target Term 2</span>
-                            <h4 class="font-bold text-slate-800 text-base mt-1">Assertion</h4>
-                            <p class="text-xs text-slate-500 mb-2">A confident statement of fact or strong belief regarding the output.</p>
-                            <select id="vocab_assertion_match" onchange="saveProgress()" class="w-full bg-slate-50 border border-slate-300 text-xs rounded-lg p-2 font-medium focus:ring-sky-400">
-                                <option value="">Match the example statement...</option>
-                                <option value="moon">"The AI system presents an image suggesting it depicted lunar gravity accurately."</option>
-                                <option value="artist">"From an artist's perspective, the vibrant cell-shaded colors are visually impressive."</option>
-                                <option value="wrong">"My strong opinion is that basketball bounce physics would never function on the moon."</option>
-                            </select>
-                        </div>
-
-                        <!-- Term 3 -->
-                        <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
-                            <span class="bg-indigo-100 text-indigo-800 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">Target Term 3</span>
-                            <h4 class="font-bold text-slate-800 text-base mt-1">Viewpoint</h4>
-                            <p class="text-xs text-slate-500 mb-2">A specific stance or perspective from which something is evaluated.</p>
-                            <select id="vocab_viewpoint_match" onchange="saveProgress()" class="w-full bg-slate-50 border border-slate-300 text-xs rounded-lg p-2 font-medium focus:ring-sky-400">
-                                <option value="">Match the example statement...</option>
-                                <option value="moon">"The AI system presents an image suggesting it depicted lunar gravity accurately."</option>
-                                <option value="artist">"From an artist's perspective, the vibrant cell-shaded colors are visually impressive."</option>
-                                <option value="wrong">"My strong opinion is that basketball bounce physics would never function on the moon."</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Interactive Critique Builder -->
-                    <div class="space-y-3">
-                        <label class="block text-sm font-semibold text-slate-800">Combine these words into your own sentence critique:</label>
-                        <textarea id="task2_sentence" rows="2" oninput="saveProgress()" placeholder='e.g., "The system makes a claim that it drew the moon correctly, but my assertion is that gravity looks wrong. From an artist viewpoint..."'
-                            class="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-400 outline-none"></textarea>
-
-                        <div class="flex items-center justify-between pt-2">
-                            <button onclick="toggleHint(2)" class="text-xs text-sky-600 hover:underline font-semibold flex items-center gap-1">
-                                <i class="fa-regular fa-lightbulb"></i> Need a Hint?
-                            </button>
-                            <button onclick="checkTask2()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
-                                Verify Vocabulary & Critique (15 pts)
-                            </button>
-                        </div>
-                        <div id="hint-2" class="hidden bg-amber-50 border border-amber-200 text-amber-800 text-xs p-3 rounded-xl mt-2">
-                            💡 <strong>Hint:</strong> Use 'Claim' for what the AI claims to depict, 'Assertion' for your definitive observation (e.g., gravity or fur detail), and 'Viewpoint' for a artist's or scientist's perspective.
-                        </div>
-                        <div id="task2_feedback" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SECTION 3: TEACH & CONCEPTS -->
-            <section id="step3" class="tab-content hidden">
-                <div class="glass-card rounded-2xl p-6 mb-6 shadow-sm border border-slate-200">
-                    <div class="flex flex-wrap justify-between items-center mb-4 gap-2 border-b border-slate-100 pb-3">
-                        <div class="flex items-center space-x-3">
-                            <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Task 3</span>
-                            <h2 class="text-xl font-bold text-slate-800">Teach: Prompts, Patterns, and AI Art</h2>
-                        </div>
-                        <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
-                            <i class="fa-solid fa-stopwatch text-sky-600"></i>
-                            <span class="text-xs font-semibold text-slate-500">Allocated: 10:00</span>
-                            <span id="timer-3" class="text-sm font-black font-mono text-slate-800">10:00</span>
-                            <button onclick="toggleTimer(3, 600)" id="btn-timer-3" class="bg-sky-600 text-white text-xs px-2.5 py-1 rounded-lg font-medium hover:bg-sky-700 transition">
-                                Start Task
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Key Concepts Infographic Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <div class="w-8 h-8 rounded-lg bg-sky-500 text-white flex items-center justify-center font-bold text-sm mb-2">1</div>
-                            <h3 class="font-bold text-slate-800 text-sm">Generative AI (4 mins)</h3>
-                            <p class="text-xs text-slate-600 mt-1">Generative AI models analyze huge pattern datasets to create entirely new text, artwork, or synthesized audio from natural text prompts.</p>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <div class="w-8 h-8 rounded-lg bg-indigo-500 text-white flex items-center justify-center font-bold text-sm mb-2">2</div>
-                            <h3 class="font-bold text-slate-800 text-sm">Writing Better Prompts (3 mins)</h3>
-                            <p class="text-xs text-slate-600 mt-1">Specific details make better images! Always combine: <span class="font-semibold text-indigo-700">[Subject] + [Art Style / Medium] + [Lighting / Colors / Atmosphere]</span>.</p>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <div class="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center font-bold text-sm mb-2">3</div>
-                            <h3 class="font-bold text-slate-800 text-sm">Fairness & Rules (3 mins)</h3>
-                            <p class="text-xs text-slate-600 mt-1">Who owns AI generated art? Are models fair to original human artists whose works trained the system? We examine ethics and copyright.</p>
-                        </div>
-                    </div>
-
-                    <!-- Concept Quiz Check -->
-                    <div class="border-t border-slate-200 pt-4">
-                        <h3 class="font-bold text-slate-800 text-sm mb-3">Concept Check Quiz:</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <p class="text-xs font-semibold text-slate-700 mb-1">Q1: Which formula yields the most predictable, high-quality image output from a Generative AI tool?</p>
-                                <div class="space-y-1.5 text-xs">
-                                    <label class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
-                                        <input type="radio" name="q_concept1" value="a" class="text-sky-600">
-                                        <span>A single vague word like "cat" or "car"</span>
-                                    </label>
-                                    <label class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
-                                        <input type="radio" name="q_concept1" value="b" class="text-sky-600">
-                                        <span>[Subject] + [Art Style] + [Lighting & Color details]</span>
-                                    </label>
-                                    <label class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
-                                        <input type="radio" name="q_concept1" value="c" class="text-sky-600">
-                                        <span>Asking the computer to guess what you want without typing</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div>
-                                <p class="text-xs font-semibold text-slate-700 mb-1">Q2: How does a diffusion or generative image model construct new artwork?</p>
-                                <div class="space-y-1.5 text-xs">
-                                    <label class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
-                                        <input type="radio" name="q_concept2" value="a" class="text-sky-600">
-                                        <span>By copying and pasting pre-made Google images directly</span>
-                                    </label>
-                                    <label class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
-                                        <input type="radio" name="q_concept2" value="b" class="text-sky-600">
-                                        <span>By synthesizing new patterns learned from vast training datasets</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="flex justify-end">
-                                <button onclick="checkTask3()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
-                                    Verify Concept Quiz (15 pts)
-                                </button>
-                            </div>
-                            <div id="task3_feedback" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SECTION 4: GENERATIVE AI ART LAB (RASPBERRY PI WORKSHEET 2 EMBEDDED) -->
-            <section id="step4" class="tab-content hidden">
-                <div class="glass-card rounded-2xl p-6 mb-6 shadow-sm border border-slate-200">
-                    <div class="flex flex-wrap justify-between items-center mb-4 gap-2 border-b border-slate-100 pb-3">
-                        <div class="flex items-center space-x-3">
-                            <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Task 4</span>
-                            <h2 class="text-xl font-bold text-slate-800">Generative AI Art Prompt Lab</h2>
-                        </div>
-                        <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
-                            <i class="fa-solid fa-stopwatch text-sky-600"></i>
-                            <span class="text-xs font-semibold text-slate-500">Allocated: 10:00</span>
-                            <span id="timer-4" class="text-sm font-black font-mono text-slate-800">10:00</span>
-                            <button onclick="toggleTimer(4, 600)" id="btn-timer-4" class="bg-sky-600 text-white text-xs px-2.5 py-1 rounded-lg font-medium hover:bg-sky-700 transition">
-                                Start Task
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Instructions Banner -->
-                    <div class="bg-sky-50 border border-sky-200 p-4 rounded-xl mb-6">
-                        <div class="flex items-start gap-3">
-                            <i class="fa-solid fa-wand-magic-sparkles text-sky-600 text-xl mt-0.5"></i>
-                            <div>
-                                <h3 class="font-bold text-sky-950 text-sm">Raspberry Pi Foundation Worksheet 2 Integration</h3>
-                                <p class="text-xs text-sky-800 mt-0.5">
-                                    Your task is to write a detailed descriptive prompt, generate artwork live using our AI engine, and analyze the resulting image.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        <!-- Left Column: Prompt Construction Engine -->
-                        <div class="lg:col-span-6 space-y-4">
-                            <!-- Support Template Helper (Visible in Support mode) -->
-                            <div id="supportPromptHelper" class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs space-y-2">
-                                <span class="font-bold text-amber-900"><i class="fa-solid fa-hand-holding-heart text-amber-600"></i> Prompt Template (Support Mode Enabled):</span>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <input type="text" id="prompt_subject" placeholder="Subject (e.g. Robot Chef)" oninput="buildHelperPrompt()" class="p-1.5 border rounded text-xs">
-                                    <input type="text" id="prompt_style" placeholder="Style (e.g. 3D Digital Art)" oninput="buildHelperPrompt()" class="p-1.5 border rounded text-xs">
-                                    <input type="text" id="prompt_lighting" placeholder="Lighting (e.g. Warm Sunset)" oninput="buildHelperPrompt()" class="p-1.5 border rounded text-xs">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Your Written Prompt *</label>
-                                <textarea id="ai_prompt_text" rows="3" oninput="saveProgress()" placeholder="e.g. A futuristic cyberpunk city floating in the sky, highly detailed, watercolor style, soft pastel colors, golden hour lighting..."
-                                    class="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-sky-400 outline-none"></textarea>
-                            </div>
-
-                            <div class="flex gap-2">
-                                <button onclick="generateAIImage()" id="btnGenerateImage" class="flex-1 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-sm py-2.5 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-paint-brush"></i> Generate AI Art Live
-                                </button>
-                            </div>
-
-                            <!-- Image Analysis Questions (Worksheet 2) -->
-                            <div class="space-y-3 pt-3 border-t border-slate-200">
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">1. What matched your prompt successfully?</label>
-                                    <textarea id="task4_matched" rows="2" oninput="saveProgress()" placeholder="List specific elements (e.g., colors, objects, artistic style) that the AI rendered correctly..."
-                                        class="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:ring-1 focus:ring-sky-400"></textarea>
-                                </div>
-
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">2. In the image produced, what did NOT match your prompt? Why do you think that happened?</label>
-                                    <textarea id="task4_unmatched" rows="2" oninput="saveProgress()" placeholder="Explain missing elements or errors (e.g., hands with extra fingers, missing background objects) and guess why..."
-                                        class="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:ring-1 focus:ring-sky-400"></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Right Column: AI Artwork Canvas Showcase -->
-                        <div class="lg:col-span-6 flex flex-col items-center justify-center bg-slate-900 rounded-2xl p-4 min-h-[320px] text-white relative overflow-hidden border border-slate-800 shadow-inner">
-                            
-                            <div id="aiImageLoading" class="hidden flex-col items-center space-y-3 z-10">
-                                <div class="w-10 h-10 border-4 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
-                                <span class="text-xs text-sky-200 font-medium">Synthesizing image with Gemini 3.1 Flash Image...</span>
-                            </div>
-
-                            <div id="aiImagePlaceholder" class="text-center p-6 text-slate-400">
-                                <i class="fa-regular fa-image text-4xl mb-3 text-slate-600"></i>
-                                <p class="text-xs font-semibold">Your AI generated artwork will render here</p>
-                                <p class="text-[10px] text-slate-500 mt-1">Type a prompt and click "Generate AI Art Live"</p>
-                            </div>
-
-                            <img id="aiImageResult" class="hidden max-h-[300px] w-auto object-contain rounded-xl shadow-2xl border border-slate-700" alt="Generated AI Art Work">
-
-                            <div id="imageMeta" class="hidden text-[10px] text-slate-400 mt-2 text-center">
-                                Generated Live via Gemini 3.1 Flash Image Engine
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end mt-4 pt-3 border-t border-slate-100">
-                        <button onclick="checkTask4()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
-                            Verify & Grade Prompt Lab (25 pts)
+                    <div class="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0 w-full sm:w-auto">
+                        <button onclick="launchArtguruStudio()" class="bg-gradient-to-r from-sky-500 via-indigo-600 to-purple-600 hover:from-sky-400 hover:to-purple-500 text-white font-extrabold text-sm px-6 py-3.5 rounded-xl shadow-lg hover:shadow-sky-500/20 transition flex items-center justify-center gap-2.5">
+                            <i class="fa-solid fa-arrow-up-right-from-square text-base"></i> Launch Artguru.ai Studio
+                        </button>
+                        <button onclick="toggleArtguruIframeView()" id="btnToggleIframeView" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-4 py-2.5 rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-window-maximize"></i> Toggle Live Webview
                         </button>
                     </div>
-                    <div id="task4_feedback" class="hidden p-3 rounded-xl text-xs font-semibold mt-2"></div>
                 </div>
-            </section>
+            </div>
 
-            <!-- SECTION 5: ETHICS & OWNERSHIP -->
-            <section id="step5" class="tab-content hidden">
-                <div class="glass-card rounded-2xl p-6 mb-6 shadow-sm border border-slate-200">
-                    <div class="flex flex-wrap justify-between items-center mb-4 gap-2 border-b border-slate-100 pb-3">
-                        <div class="flex items-center space-x-3">
-                            <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Task 5</span>
-                            <h2 class="text-xl font-bold text-slate-800">Critical Analysis: AI Ethics & Ownership</h2>
+            <!-- Embedded Live Webview Frame (Hidden by default, toggleable) -->
+            <div id="artguruIframeContainer" class="hidden mb-6 rounded-2xl overflow-hidden border border-slate-700 bg-slate-950 relative shadow-2xl" style="height: 550px;">
+                <iframe id="artguruIframe" src="https://www.artguru.ai/ai-text-to-image-generator/" class="w-full h-full border-0" title="Artguru AI Text to Image Generator"></iframe>
+                <div class="absolute bottom-3 right-3 bg-slate-900/90 backdrop-blur-md px-4 py-2 rounded-xl border border-slate-700 text-xs text-slate-300 flex items-center gap-3 shadow-xl">
+                    <span>Opening in external window works best:</span>
+                    <a href="https://www.artguru.ai/ai-text-to-image-generator/" target="_blank" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-3 py-1 rounded-lg text-xs flex items-center gap-1">
+                        Open Artguru <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- PROMPT DRAFTING ASSISTANT STUDIO -->
+            <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 border border-slate-800 shadow-xl mb-6">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-pen-ruler text-sky-400"></i>
+                        <span class="font-extrabold text-sm text-white">Artguru AI Prompt Drafter</span>
+                    </div>
+                    <span class="text-xs text-slate-400 font-mono">Step 1: Write & Copy Prompt</span>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Support Prompt Helper Mode -->
+                    <div id="supportPromptHelper" class="bg-slate-800/90 border border-slate-700 p-3.5 rounded-xl text-xs space-y-2">
+                        <span class="font-bold text-amber-400 flex items-center gap-1.5"><i class="fa-solid fa-hand-holding-heart"></i> Prompt Builder Helper (Support Mode):</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <input type="text" id="prompt_subject" placeholder="Subject (e.g. Robot Chef)" oninput="buildHelperPrompt()" class="p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white outline-none focus:border-sky-500">
+                            <input type="text" id="prompt_style" placeholder="Style (e.g. Cyberpunk)" oninput="buildHelperPrompt()" class="p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white outline-none focus:border-sky-500">
+                            <input type="text" id="prompt_lighting" placeholder="Lighting (e.g. Sunset)" oninput="buildHelperPrompt()" class="p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white outline-none focus:border-sky-500">
                         </div>
-                        <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
-                            <i class="fa-solid fa-stopwatch text-sky-600"></i>
-                            <span class="text-xs font-semibold text-slate-500">Allocated: 05:00</span>
-                            <span id="timer-5" class="text-sm font-black font-mono text-slate-800">05:00</span>
-                            <button onclick="toggleTimer(5, 300)" id="btn-timer-5" class="bg-sky-600 text-white text-xs px-2.5 py-1 rounded-lg font-medium hover:bg-sky-700 transition">
-                                Start Task
+                    </div>
+
+                    <!-- Main Prompt Input -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-bold text-slate-300 uppercase tracking-wider">1. Enter Your Structured AI Prompt *</label>
+                            <span class="text-[10px] text-slate-400">Include [Subject] + [Style] + [Details]</span>
+                        </div>
+                        <textarea id="ai_prompt_text" rows="3" oninput="handleStudentActivity()" placeholder="e.g. A futuristic robot reading a glowing holographic book in a lush botanical garden, highly detailed, cyberpunk style, dramatic sunset lighting..."
+                            class="w-full p-3.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-medium text-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition"></textarea>
+                    </div>
+
+                    <!-- Quick Prompt Modifier Chips -->
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Quick Style Modifiers:</span>
+                        <div class="flex flex-wrap gap-1.5 text-xs">
+                            <button onclick="addPromptChip('cyberpunk style')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">
+                                + Cyberpunk style
+                            </button>
+                            <button onclick="addPromptChip('3D render')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">
+                                + 3D Render
+                            </button>
+                            <button onclick="addPromptChip('golden hour lighting')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">
+                                + Golden hour lighting
+                            </button>
+                            <button onclick="addPromptChip('hyperdetailed 8K')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">
+                                + Hyperdetailed 8K
+                            </button>
+                            <button onclick="addPromptChip('vibrant watercolor')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">
+                                + Vibrant watercolor
                             </button>
                         </div>
                     </div>
 
-                    <p class="text-xs text-slate-600 mb-4">
-                        Reflect deeply on the societal impact of generative art tools (Raspberry Pi Foundation Core Questions):
-                    </p>
+                    <!-- Copy Prompt Action Button -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                        <button onclick="copyPromptAndLaunchArtguru()" class="bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl transition flex items-center gap-2 shadow-md">
+                            <i class="fa-solid fa-copy"></i> Copy Prompt & Open Artguru.ai
+                        </button>
+                        <span id="copyPromptStatus" class="text-xs text-emerald-400 font-bold hidden">
+                            <i class="fa-solid fa-check"></i> Prompt Copied to Clipboard!
+                        </span>
+                    </div>
+                </div>
+            </div>
 
-                    <div class="space-y-5">
-                        <!-- Reflection Q1 -->
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <label class="block text-sm font-bold text-slate-800 mb-1">
-                                Question 1: When we use AI tools to generate art, WHO does this help?
-                            </label>
-                            <p class="text-xs text-slate-500 mb-2">Think about game developers, non-artists, students, companies, etc.</p>
-                            <textarea id="task5_who_helps" rows="2" oninput="saveProgress()" placeholder="Explain who benefits and how..."
-                                class="w-full p-3 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-sky-400"></textarea>
+            <!-- FILE ATTACHMENT SECTION -->
+            <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-5 mb-6 transition-all" id="dropZoneContainer">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center text-xl shrink-0">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
                         </div>
-
-                        <!-- Reflection Q2 -->
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <label class="block text-sm font-bold text-slate-800 mb-1">
-                                Question 2: Who OWNS the art generated by AI, and WHY?
-                            </label>
-                            <p class="text-xs text-slate-500 mb-2">Consider the person writing the prompt, the software creators, or the original artists whose data trained the model.</p>
-                            <textarea id="task5_who_owns" rows="2" oninput="saveProgress()" placeholder="Discuss ownership rights and reasons..."
-                                class="w-full p-3 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-sky-400"></textarea>
-                        </div>
-
-                        <!-- Ethics Multiple Choice -->
                         <div>
-                            <p class="text-xs font-bold text-slate-700 mb-2">Q3: Which ethical issue is most associated with training Generative AI image generators?</p>
-                            <div class="space-y-1.5 text-xs">
-                                <label class="flex items-center space-x-2 bg-white p-2.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
-                                    <input type="radio" name="q_ethics" value="copyright" class="text-sky-600">
-                                    <span>Using human artists' copyrighted works without explicit permission or compensation</span>
-                                </label>
-                                <label class="flex items-center space-x-2 bg-white p-2.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
-                                    <input type="radio" name="q_ethics" value="battery" class="text-sky-600">
-                                    <span>Computers consuming too much monitor screen brightness</span>
-                                </label>
+                            <h3 class="text-sm font-bold text-slate-800">Attach Generated Artguru Image File *</h3>
+                            <p class="text-xs text-slate-500">Step 2: Upload your saved artwork file (.png, .jpg, .webp, .pdf)</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <label for="fileAttachmentInput" class="cursor-pointer bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto">
+                            <i class="fa-solid fa-paperclip"></i> Choose Image File
+                        </label>
+                        <input type="file" id="fileAttachmentInput" onchange="handleFileUpload(event)" accept="image/*,.pdf,.zip,.docx" class="hidden">
+                    </div>
+                </div>
+
+                <!-- Attachment Preview Box -->
+                <div id="attachmentPreview" class="hidden mt-4 pt-4 border-t border-slate-200">
+                    <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
+                        <div class="flex items-center space-x-3 overflow-hidden">
+                            <img id="attachedImageThumbnail" class="w-12 h-12 object-cover rounded-lg border border-slate-200 hidden" alt="Attached preview">
+                            <div id="attachedFileIcon" class="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 text-xl">
+                                <i class="fa-solid fa-file"></i>
+                            </div>
+                            <div class="truncate">
+                                <p id="attachedFileName" class="text-xs font-bold text-slate-800 truncate">my_ai_art.png</p>
+                                <p id="attachedFileSize" class="text-[10px] text-slate-500">245 KB • Attached successfully</p>
                             </div>
                         </div>
-
-                        <div class="flex justify-end pt-2">
-                            <button onclick="checkTask5()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
-                                Submit Critical Reflection (20 pts)
-                            </button>
-                        </div>
-                        <div id="task5_feedback" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+                        <button onclick="removeAttachment()" class="text-red-500 hover:text-red-700 text-xs font-bold px-2 py-1 rounded hover:bg-red-50 transition">
+                            <i class="fa-solid fa-trash-can"></i> Remove
+                        </button>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <!-- SECTION 6: EXIT TICKET & CLOSURE -->
-            <section id="step6" class="tab-content hidden">
-                <div class="glass-card rounded-2xl p-6 mb-6 shadow-sm border border-slate-200">
-                    <div class="flex flex-wrap justify-between items-center mb-4 gap-2 border-b border-slate-100 pb-3">
-                        <div class="flex items-center space-x-3">
-                            <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Task 6</span>
-                            <h2 class="text-xl font-bold text-slate-800">Exit Ticket & Lesson Reflection</h2>
-                        </div>
-                        <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
-                            <i class="fa-solid fa-stopwatch text-sky-600"></i>
-                            <span class="text-xs font-semibold text-slate-500">Allocated: 02:00</span>
-                            <span id="timer-6" class="text-sm font-black font-mono text-slate-800">02:00</span>
-                            <button onclick="toggleTimer(6, 120)" id="btn-timer-6" class="bg-sky-600 text-white text-xs px-2.5 py-1 rounded-lg font-medium hover:bg-sky-700 transition">
-                                Start Task
-                            </button>
-                        </div>
+            <!-- Image Analysis Questions (Raspberry Pi Foundation Worksheet 2) -->
+            <div class="space-y-4 pt-2 border-t border-slate-200">
+                <h3 class="font-bold text-slate-800 text-sm">Worksheet 2 Image Analysis Questions:</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">1. What matched your prompt successfully?</label>
+                        <textarea id="task4_matched" rows="3" oninput="handleStudentActivity()" placeholder="List specific elements (e.g., colors, objects, artistic style) that Artguru rendered correctly..."
+                            class="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-sky-400"></textarea>
                     </div>
 
-                    <!-- Complete the sentence challenge -->
-                    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border-l-4 border-emerald-500 p-4 rounded-r-xl mb-5">
-                        <p class="font-bold text-emerald-950 text-sm">Student Reflection Frame:</p>
-                        <p class="text-xs text-emerald-800 mt-1">Complete the sentence below accurately reflecting today's learning outcomes:</p>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">
-                                "AI art tools can help people by <span class="text-sky-600">[Fill Part 1]</span>, BUT they might be unfair to <span class="text-sky-600">[Fill Part 2]</span>."
-                            </label>
-                            <textarea id="task6_reflection" rows="3" oninput="saveProgress()" placeholder="Complete both parts of the sentence clearly..."
-                                class="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-emerald-400"></textarea>
-                        </div>
-
-                        <!-- Wrap up note -->
-                        <div class="bg-slate-100 p-3 rounded-xl border border-slate-200 text-xs text-slate-700 flex items-center gap-2">
-                            <i class="fa-solid fa-graduation-cap text-sky-600 text-lg"></i>
-                            <span><strong>Wrap-Up:</strong> Great work! Next week we will learn how to speak like real computer scientists when talking about AI algorithms!</span>
-                        </div>
-
-                        <div class="flex justify-end pt-2">
-                            <button onclick="checkTask6()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-5 py-2.5 rounded-lg shadow transition">
-                                Submit Final Exit Ticket (15 pts)
-                            </button>
-                        </div>
-                        <div id="task6_feedback" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">2. What did NOT match your prompt? Why do you think that happened?</label>
+                        <textarea id="task4_unmatched" rows="3" oninput="handleStudentActivity()" placeholder="Explain missing elements or errors (e.g., extra objects, unexpected colors) and guess why..."
+                            class="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-sky-400"></textarea>
                     </div>
                 </div>
-            </section>
-        </div>
+
+                <div class="flex justify-end pt-2">
+                    <button onclick="checkTask4()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition">
+                        Verify Art Lab & Image Analysis (25 pts)
+                    </button>
+                </div>
+                <div id="task4_feedback" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: ETHICS & OWNERSHIP -->
+        <section id="task-5" class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div class="flex flex-wrap justify-between items-center mb-4 gap-2 border-b border-slate-100 pb-3">
+                <div class="flex items-center space-x-3">
+                    <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Task 5</span>
+                    <h2 class="text-xl font-bold text-slate-800">Critical Analysis: AI Ethics & Ownership</h2>
+                </div>
+                <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+                    <i class="fa-solid fa-stopwatch text-sky-600"></i>
+                    <span class="text-xs font-semibold text-slate-500">Allocated: 05:00</span>
+                    <span id="timer-5" class="text-sm font-black font-mono text-slate-800">05:00</span>
+                </div>
+            </div>
+
+            <p class="text-xs text-slate-600 mb-4">
+                Reflect deeply on the societal impact of generative art tools (Raspberry Pi Foundation Core Questions):
+            </p>
+
+            <div class="space-y-4">
+                <!-- Reflection Q1 -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <label class="block text-sm font-bold text-slate-800 mb-1">
+                        Question 1: When we use AI tools to generate art, WHO does this help?
+                    </label>
+                    <p class="text-xs text-slate-500 mb-2">Think about game developers, non-artists, students, companies, etc.</p>
+                    <textarea id="task5_who_helps" rows="2" oninput="handleStudentActivity()" placeholder="Explain who benefits and how..."
+                        class="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-sky-400"></textarea>
+                </div>
+
+                <!-- Reflection Q2 -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <label class="block text-sm font-bold text-slate-800 mb-1">
+                        Question 2: Who OWNS the art generated by AI, and WHY?
+                    </label>
+                    <p class="text-xs text-slate-500 mb-2">Consider the person writing the prompt, the software creators, or the original artists whose data trained the model.</p>
+                    <textarea id="task5_who_owns" rows="2" oninput="handleStudentActivity()" placeholder="Discuss ownership rights and reasons..."
+                        class="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-sky-400"></textarea>
+                </div>
+
+                <!-- Ethics Multiple Choice -->
+                <div>
+                    <p class="text-xs font-bold text-slate-700 mb-2">Q3: Which ethical issue is most associated with training Generative AI image generators?</p>
+                    <div class="space-y-1.5 text-xs">
+                        <label class="flex items-center space-x-2 bg-white p-2.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                            <input type="radio" name="q_ethics" value="copyright" onchange="handleStudentActivity()" class="text-sky-600">
+                            <span>Using human artists' copyrighted works without explicit permission or compensation</span>
+                        </label>
+                        <label class="flex items-center space-x-2 bg-white p-2.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                            <input type="radio" name="q_ethics" value="battery" onchange="handleStudentActivity()" class="text-sky-600">
+                            <span>Computers consuming too much monitor screen brightness</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button onclick="checkTask5()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition">
+                        Submit Critical Reflection (20 pts)
+                    </button>
+                </div>
+                <div id="task5_feedback" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: EXIT TICKET & CLOSURE -->
+        <section id="task-6" class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div class="flex flex-wrap justify-between items-center mb-4 gap-2 border-b border-slate-100 pb-3">
+                <div class="flex items-center space-x-3">
+                    <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Task 6</span>
+                    <h2 class="text-xl font-bold text-slate-800">Exit Ticket & Lesson Reflection</h2>
+                </div>
+                <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+                    <i class="fa-solid fa-stopwatch text-sky-600"></i>
+                    <span class="text-xs font-semibold text-slate-500">Allocated: 02:00</span>
+                    <span id="timer-6" class="text-sm font-black font-mono text-slate-800">02:00</span>
+                </div>
+            </div>
+
+            <!-- Complete the sentence challenge -->
+            <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border-l-4 border-emerald-500 p-4 rounded-r-xl mb-4">
+                <p class="font-bold text-emerald-950 text-sm">Student Reflection Frame:</p>
+                <p class="text-xs text-emerald-800 mt-1">Complete the sentence below accurately reflecting today's learning outcomes:</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">
+                        "AI art tools can help people by <span class="text-sky-600">[Fill Part 1]</span>, BUT they might be unfair to <span class="text-sky-600">[Fill Part 2]</span>."
+                    </label>
+                    <textarea id="task6_reflection" rows="3" oninput="handleStudentActivity()" placeholder="Complete both parts of the sentence clearly..."
+                        class="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-emerald-400"></textarea>
+                </div>
+
+                <!-- Wrap up note -->
+                <div class="bg-slate-100 p-3 rounded-xl border border-slate-200 text-xs text-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap text-sky-600 text-lg"></i>
+                    <span><strong>Wrap-Up:</strong> Great work! Next week we will learn how to speak like real computer scientists when talking about AI algorithms!</span>
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button onclick="checkTask6()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow transition">
+                        Submit Final Exit Ticket (15 pts)
+                    </button>
+                </div>
+                <div id="task6_feedback" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+            </div>
+        </section>
 
         <!-- SUBMISSION & DOWNLOAD PANEL -->
-        <div class="glass-card rounded-2xl p-6 mb-12 border border-slate-200 text-center shadow-md no-print">
-            <h3 class="text-lg font-bold text-slate-800 mb-2">Ready to Submit Your Assignment?</h3>
+        <div class="glass-card rounded-2xl p-6 border border-slate-200 text-center shadow-md no-print">
+            <h3 class="text-lg font-bold text-slate-800 mb-1">Ready to Submit Your Assignment?</h3>
             <p class="text-xs text-slate-600 max-w-xl mx-auto mb-4">
-                Ensure all tasks are completed and verified above. Download your completed worksheet as a PDF file to upload directly to Google Classroom.
+                Ensure all tasks are completed and verified above. Download your completed worksheet with attached files as a PDF to upload to Google Classroom.
             </p>
             <div class="flex flex-wrap justify-center gap-3">
                 <button onclick="exportToPDF()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm px-6 py-3 rounded-xl shadow-lg transition flex items-center gap-2">
                     <i class="fa-solid fa-file-arrow-down text-lg"></i> Download Worksheet PDF
                 </button>
                 <button onclick="copySubmissionLink()" class="bg-sky-700 hover:bg-sky-600 text-white font-semibold text-sm px-5 py-3 rounded-xl shadow-md transition flex items-center gap-2">
-                    <i class="fa-solid fa-copy"></i> Copy Google Classroom Submission Data
+                    <i class="fa-solid fa-copy"></i> Copy Classroom Data
                 </button>
             </div>
         </div>
@@ -685,6 +906,8 @@
             studentId: '',
             section: '',
             diffMode: 'standard', // support, standard, challenge
+            currentTeachSlide: 1,
+            totalTeachSlides: 4,
             scores: {
                 task1: 0,
                 task2: 0,
@@ -693,132 +916,132 @@
                 task5: 0,
                 task6: 0
             },
-            timers: {},
-            timerIntervals: {},
-            generatedImageBase64: null
+            masterTimerSeconds: 33 * 60, // 33 minutes total
+            masterTimerRunning: false,
+            masterTimerInterval: null,
+            attachedFile: null
         };
 
         /* WEB AUDIO API FOR TIMERS & ALERTS */
-        function playTone(freq, type, duration) {
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type || 'sine';
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch(e) { console.log('Audio error:', e); }
-        }
+        /* TASK 3 SLIDE DECK NAVIGATION FUNCTIONS */
+        function goToTeachSlide(slideNum) {
+            if (slideNum < 1 || slideNum > state.totalTeachSlides) return;
+            
+            state.currentTeachSlide = slideNum;
 
-        function playTimeWarning() {
-            playTone(440, 'sine', 0.2);
-            setTimeout(() => playTone(330, 'sine', 0.3), 200);
-        }
-
-        function playTimeUpGong() {
-            playTone(220, 'square', 0.4);
-            setTimeout(() => playTone(180, 'square', 0.6), 300);
-        }
-
-        /* TAB NAVIGATION SYSTEM */
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('block'));
-            document.getElementById(tabId).classList.remove('hidden');
-            document.getElementById(tabId).classList.add('block');
-
-            // Button styling
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-white', 'border-t-2', 'border-sky-600', 'text-sky-600', 'shadow-sm');
-                btn.classList.add('text-slate-600', 'hover:bg-slate-100');
-            });
-
-            const activeBtn = document.getElementById('tab-' + tabId);
-            if (activeBtn) {
-                activeBtn.classList.add('bg-white', 'border-t-2', 'border-sky-600', 'text-sky-600', 'shadow-sm');
-                activeBtn.classList.remove('text-slate-600');
-            }
-        }
-
-        /* TIMER MANAGEMENT */
-        function toggleTimer(taskNum, durationSeconds) {
-            const btn = document.getElementById(`btn-timer-${taskNum}`);
-            const timerDisplay = document.getElementById(`timer-${taskNum}`);
-
-            if (state.timerIntervals[taskNum]) {
-                // Pause Timer
-                clearInterval(state.timerIntervals[taskNum]);
-                state.timerIntervals[taskNum] = null;
-                btn.innerText = 'Resume';
-                btn.classList.remove('bg-amber-600');
-                btn.classList.add('bg-sky-600');
-            } else {
-                // Start Timer
-                playTone(600, 'sine', 0.15); // Start chirp
-                btn.innerText = 'Pause';
-                btn.classList.remove('bg-sky-600');
-                btn.classList.add('bg-amber-600');
-
-                if (!state.timers[taskNum] && state.timers[taskNum] !== 0) {
-                    state.timers[taskNum] = durationSeconds;
+            // Hide all slides, show target slide
+            for (let i = 1; i <= state.totalTeachSlides; i++) {
+                const slide = document.getElementById(`teachSlide${i}`);
+                const tab = document.getElementById(`slideTab${i}`);
+                if (slide) slide.classList.add('hidden');
+                if (tab) {
+                    tab.className = "px-3 py-1.5 rounded-lg font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800";
                 }
-
-                state.timerIntervals[taskNum] = setInterval(() => {
-                    state.timers[taskNum]--;
-                    
-                    let m = Math.floor(state.timers[taskNum] / 60);
-                    let s = state.timers[taskNum] % 60;
-                    timerDisplay.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-
-                    if (state.timers[taskNum] === 10) {
-                        playTimeWarning();
-                        timerDisplay.classList.add('text-amber-600', 'animate-pulse');
-                    }
-
-                    if (state.timers[taskNum] <= 0) {
-                        clearInterval(state.timerIntervals[taskNum]);
-                        state.timerIntervals[taskNum] = null;
-                        playTimeUpGong();
-                        timerDisplay.innerText = "00:00";
-                        timerDisplay.classList.remove('text-amber-600', 'animate-pulse');
-                        timerDisplay.classList.add('text-red-600');
-                        btn.innerText = 'Time Up!';
-                        btn.disabled = true;
-                        btn.classList.add('opacity-50', 'cursor-not-allowed');
-                        showToast(`Time is up for Task ${taskNum}!`, 'warning');
-                    }
-                }, 1000);
             }
-        }
 
-        /* DIFFERENTIATION MODES */
-        function setDiffMode(mode) {
-            state.diffMode = mode;
-            ['Support', 'Standard', 'Challenge'].forEach(m => {
-                const btn = document.getElementById(`btnDiff${m}`);
-                if (m.toLowerCase() === mode) {
-                    btn.className = "px-2.5 py-1 rounded-md bg-white text-sky-700 shadow-sm transition";
+            const activeSlide = document.getElementById(`teachSlide${slideNum}`);
+            const activeTab = document.getElementById(`slideTab${slideNum}`);
+            if (activeSlide) activeSlide.classList.remove('hidden');
+            if (activeTab) {
+                activeTab.className = "px-3 py-1.5 rounded-lg font-bold transition bg-sky-600 text-white shadow";
+            }
+
+            // Update Counter Badge
+            const counter = document.getElementById('slideCounterBadge');
+            if (counter) counter.innerText = `Slide ${slideNum} of ${state.totalTeachSlides}`;
+
+            // Update prev/next button states
+            const btnPrev = document.getElementById('btnPrevSlide');
+            const btnNext = document.getElementById('btnNextSlide');
+
+            if (btnPrev) {
+                if (slideNum === 1) {
+                    btnPrev.disabled = true;
+                    btnPrev.classList.add('opacity-50', 'cursor-not-allowed');
                 } else {
-                    btn.className = "px-2.5 py-1 rounded-md text-slate-700 transition";
+                    btnPrev.disabled = false;
+                    btnPrev.classList.remove('opacity-50', 'cursor-not-allowed');
                 }
-            });
-
-            const supportHelper = document.getElementById('supportPromptHelper');
-            if (mode === 'support') {
-                supportHelper.classList.remove('hidden');
-                showToast('Support Mode: Prompt builder template enabled!');
-            } else {
-                supportHelper.classList.add('hidden');
             }
 
-            if (mode === 'challenge') {
-                showToast('Challenge Mode: Write a prompt that intentionally trick/tests the AI generator!');
+            if (btnNext) {
+                if (slideNum === state.totalTeachSlides) {
+                    btnNext.innerHTML = 'Finish Slides <i class="fa-solid fa-check"></i>';
+                } else {
+                    btnNext.innerHTML = 'Next Slide <i class="fa-solid fa-arrow-right"></i>';
+                }
             }
+
+            // Update indicator dots
+            const dotsContainer = document.getElementById('slideDotsContainer');
+            if (dotsContainer) {
+                dotsContainer.innerHTML = '';
+                for (let i = 1; i <= state.totalTeachSlides; i++) {
+                    const dot = document.createElement('span');
+                    dot.className = i === slideNum ? 'w-2.5 h-2.5 rounded-full bg-sky-500' : 'w-2.5 h-2.5 rounded-full bg-slate-700';
+                    dotsContainer.appendChild(dot);
+                }
+            }
+
+            playTone(600 + (slideNum * 100), 'sine', 0.08);
+        }
+
+        function changeTeachSlide(direction) {
+            goToTeachSlide(state.currentTeachSlide + direction);
+        }
+
+        /* ARTGURU AI LAUNCHER HELPERS */
+        function launchArtguruStudio() {
+            window.open('https://www.artguru.ai/ai-text-to-image-generator/', '_blank');
+            showToast('Opening Artguru.ai Generator Studio in new tab!');
+        }
+
+        function toggleArtguruIframeView() {
+            const container = document.getElementById('artguruIframeContainer');
+            if (container) {
+                container.classList.toggle('hidden');
+                const isHidden = container.classList.contains('hidden');
+                document.getElementById('btnToggleIframeView').innerHTML = isHidden 
+                    ? '<i class="fa-solid fa-window-maximize"></i> Toggle Live Webview' 
+                    : '<i class="fa-solid fa-eye-slash"></i> Hide Live Webview';
+                showToast(isHidden ? 'Webview hidden' : 'Showing live webview frame');
+            }
+        }
+
+        function addPromptChip(text) {
+            const textarea = document.getElementById('ai_prompt_text');
+            if (textarea.value.trim().length > 0 && !textarea.value.trim().endsWith(',')) {
+                textarea.value += ', ';
+            }
+            textarea.value += text;
+            handleStudentActivity();
+        }
+
+        function copyPromptAndLaunchArtguru() {
+            const promptText = document.getElementById('ai_prompt_text').value.trim();
+            if (!promptText) {
+                showToast('Please type or draft a prompt first!', 'error');
+                return;
+            }
+
+            // Clipboard fallback
+            const el = document.createElement('textarea');
+            el.value = promptText;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            const statusEl = document.getElementById('copyPromptStatus');
+            if (statusEl) {
+                statusEl.classList.remove('hidden');
+                setTimeout(() => statusEl.classList.add('hidden'), 3500);
+            }
+
+            showToast('Prompt copied to clipboard! Launching Artguru.ai...');
+            setTimeout(() => {
+                window.open('https://www.artguru.ai/ai-text-to-image-generator/', '_blank');
+            }, 600);
         }
 
         function buildHelperPrompt() {
@@ -832,90 +1055,21 @@
             if (light) constructed += (constructed ? ', ' : '') + light + ' lighting';
 
             document.getElementById('ai_prompt_text').value = constructed;
-            saveProgress();
+            handleStudentActivity();
         }
 
-        /* LIVE GEMINI IMAGE GENERATION */
-        async function generateAIImage() {
-            const promptText = document.getElementById('ai_prompt_text').value.trim();
-            if (!promptText) {
-                showToast('Please type a descriptive prompt first!', 'error');
-                return;
-            }
-
-            const loadingEl = document.getElementById('aiImageLoading');
-            const placeholderEl = document.getElementById('aiImagePlaceholder');
-            const imgResultEl = document.getElementById('aiImageResult');
-            const metaEl = document.getElementById('imageMeta');
-
-            loadingEl.classList.remove('hidden');
-            loadingEl.classList.add('flex');
-            placeholderEl.classList.add('hidden');
-            imgResultEl.classList.add('hidden');
-
-            try {
-                // Call Gemini 3.1 Flash Image API endpoint with empty key (handled by platform runtime)
-                const apiKey = ""; 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
-
-                const payload = {
-                    contents: [{
-                        role: 'user',
-                        parts: [{ text: promptText }]
-                    }],
-                    generationConfig: {
-                        responseModalities: ['IMAGE'],
-                        imageConfig: { aspectRatio: "1:1" }
-                    }
-                };
-
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-                const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
-
-                if (part && part.inlineData) {
-                    const mimeType = part.inlineData.mimeType || 'image/png';
-                    const base64Data = part.inlineData.data;
-                    const imageUrl = `data:${mimeType};base64,${base64Data}`;
-
-                    imgResultEl.src = imageUrl;
-                    imgResultEl.classList.remove('hidden');
-                    metaEl.classList.remove('hidden');
-                    state.generatedImageBase64 = imageUrl;
-                    showToast('Art synthesized successfully!');
-                } else {
-                    throw new Error('Image generation response structure invalid.');
-                }
-            } catch (err) {
-                console.error('Image Generation Fallback:', err);
-                // Fallback placeholder visualization
-                imgResultEl.src = `https://placehold.co/400x400/0284c7/ffffff?text=${encodeURIComponent('Generated: ' + promptText.substring(0, 20) + '...')}`;
-                imgResultEl.classList.remove('hidden');
-                showToast('Sample art generated (Preview mode)', 'warning');
-            } finally {
-                loadingEl.classList.add('hidden');
-                loadingEl.classList.remove('flex');
-            }
-        }
-
-        /* TASK VERIFICATION & GRADING FUNCTIONS */
-
+        /* TASK EVALUATION & GRADING */
         function checkTask1() {
             const resp = document.getElementById('task1_response').value.trim();
             const feedback = document.getElementById('task1_feedback');
             
-            if (resp.length >= 15) {
+            if (resp.length >= 10) {
                 state.scores.task1 = 10;
-                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200";
+                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 mt-2";
                 feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Great initial hypothesis recorded! (+10 pts)';
             } else {
                 state.scores.task1 = 0;
-                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200";
+                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200 mt-2";
                 feedback.innerHTML = '⚠️ Please write at least one complete sentence explaining your initial thoughts.';
             }
             feedback.classList.remove('hidden');
@@ -927,7 +1081,6 @@
             const assertionVal = document.getElementById('vocab_assertion_match').value;
             const viewpointVal = document.getElementById('vocab_viewpoint_match').value;
             const sentenceText = document.getElementById('task2_sentence').value.toLowerCase();
-
             const feedback = document.getElementById('task2_feedback');
 
             let score = 0;
@@ -935,17 +1088,17 @@
             if (assertionVal === 'wrong') score += 3;
             if (viewpointVal === 'artist') score += 3;
 
-            const containsTerms = (sentenceText.includes('claim') || sentenceText.includes('assertion') || sentenceText.includes('viewpoint')) && sentenceText.length > 20;
+            const containsTerms = (sentenceText.includes('claim') || sentenceText.includes('assertion') || sentenceText.includes('viewpoint')) && sentenceText.length > 15;
             if (containsTerms) score += 6;
 
             state.scores.task2 = score;
 
             if (score >= 12) {
-                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200";
-                feedback.innerHTML = `<i class="fa-solid fa-circle-check"></i> Excellent critique! matched correctly & term sentence verified! (+${score}/15 pts)`;
+                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 mt-2";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check"></i> Excellent critique! Vocabulary matched & sentence verified! (+${score}/15 pts)`;
             } else {
-                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200";
-                feedback.innerHTML = `⚠️ Score: ${score}/15 pts. Check matching: Claim = AI representation statement, Assertion = your conclusion, Viewpoint = artist stance!`;
+                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200 mt-2";
+                feedback.innerHTML = `⚠️ Score: ${score}/15 pts. Check vocabulary matches: Claim = AI statement, Assertion = your conclusion, Viewpoint = artist stance!`;
             }
             feedback.classList.remove('hidden');
             recalculateScore();
@@ -963,10 +1116,10 @@
             state.scores.task3 = score;
 
             if (score === 15) {
-                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200";
-                feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Perfect! You clearly understand prompt structures and AI patterns! (+15 pts)';
+                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 mt-2";
+                feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Perfect! You understand prompt structures and AI patterns! (+15 pts)';
             } else {
-                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200";
+                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200 mt-2";
                 feedback.innerHTML = `⚠️ Score: ${score}/15 pts. Remember: Generative AI uses pattern datasets and requires detailed structured prompts.`;
             }
             feedback.classList.remove('hidden');
@@ -980,18 +1133,18 @@
             const feedback = document.getElementById('task4_feedback');
 
             let score = 0;
-            if (prompt.length > 10) score += 10;
-            if (matched.length > 10) score += 7;
-            if (unmatched.length > 10) score += 8;
+            if (prompt.length > 8) score += 10;
+            if (matched.length > 8) score += 7;
+            if (unmatched.length > 8) score += 8;
 
             state.scores.task4 = score;
 
             if (score >= 20) {
-                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200";
+                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 mt-2";
                 feedback.innerHTML = `<i class="fa-solid fa-circle-check"></i> Fantastic prompt lab work! Image analysis verified (+${score}/25 pts)`;
             } else {
-                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200";
-                feedback.innerHTML = `⚠️ Score: ${score}/25 pts. Ensure you write a detailed prompt and complete both reflection questions!`;
+                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200 mt-2";
+                feedback.innerHTML = `⚠️ Score: ${score}/25 pts. Write a detailed prompt and complete both reflection questions!`;
             }
             feedback.classList.remove('hidden');
             recalculateScore();
@@ -1004,18 +1157,18 @@
             const feedback = document.getElementById('task5_feedback');
 
             let score = 0;
-            if (whoHelps.length > 15) score += 7;
-            if (whoOwns.length > 15) score += 8;
+            if (whoHelps.length > 10) score += 7;
+            if (whoOwns.length > 10) score += 8;
             if (q3 === 'copyright') score += 5;
 
             state.scores.task5 = score;
 
             if (score >= 15) {
-                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200";
+                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 mt-2";
                 feedback.innerHTML = `<i class="fa-solid fa-circle-check"></i> Excellent critical thinking regarding AI copyright and ownership! (+${score}/20 pts)`;
             } else {
-                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200";
-                feedback.innerHTML = `⚠️ Score: ${score}/20 pts. Make sure to thoroughly answer who benefits and who owns the artwork.`;
+                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200 mt-2";
+                feedback.innerHTML = `⚠️ Score: ${score}/20 pts. Make sure to answer who benefits and who owns the artwork.`;
             }
             feedback.classList.remove('hidden');
             recalculateScore();
@@ -1025,13 +1178,13 @@
             const reflection = document.getElementById('task6_reflection').value.trim();
             const feedback = document.getElementById('task6_feedback');
 
-            if (reflection.length >= 25) {
+            if (reflection.length >= 15) {
                 state.scores.task6 = 15;
-                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200";
+                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 mt-2";
                 feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Exit Ticket Complete! (+15 pts)';
             } else {
                 state.scores.task6 = 0;
-                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200";
+                feedback.className = "p-3 rounded-xl text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200 mt-2";
                 feedback.innerHTML = '⚠️ Please complete the full exit reflection sentence to finish!';
             }
             feedback.classList.remove('hidden');
@@ -1048,7 +1201,6 @@
             showToast('All worksheet tasks evaluated!');
         }
 
-        /* OVERALL SCORE CALCULATOR */
         function recalculateScore() {
             const total = Object.values(state.scores).reduce((a, b) => a + b, 0);
             document.getElementById('totalScore').innerText = total;
@@ -1074,17 +1226,6 @@
         function toggleHint(taskId) {
             const hint = document.getElementById(`hint-${taskId}`);
             if (hint) hint.classList.toggle('hidden');
-        }
-
-        function updatePDFHeader() {
-            state.studentName = document.getElementById('studentName').value;
-            state.studentId = document.getElementById('studentId').value;
-            state.section = document.getElementById('sectionSelect').value;
-            saveProgress();
-        }
-
-        function saveProgress() {
-            recalculateScore();
         }
 
         function showToast(msg, type = 'success') {
@@ -1114,20 +1255,14 @@
             const sSec = document.getElementById('sectionSelect').value;
 
             if (!sName || !sId || !sSec) {
-                showToast('Please fill in Name, Student ID, and Section (7A-7G) before downloading PDF!', 'error');
+                showToast('Please fill in Student Name, ID, and Section (7A-7G) before exporting!', 'error');
                 return;
             }
 
-            // Ensure all sections are visible for print capture
-            document.querySelectorAll('.tab-content').forEach(el => {
-                el.classList.remove('hidden');
-                el.classList.add('block');
-            });
-
             const element = document.getElementById('pdf-printable-area');
             const opt = {
-                margin:       [0.4, 0.4, 0.4, 0.4],
-                filename:     `DMES_ICT_Grade7_${sSec}_${sName.replace(/\s+/g, '_')}_Worksheet2.pdf`,
+                margin:       [0.3, 0.3, 0.3, 0.3],
+                filename:     `DMES_ICT_Grade7_${sSec}_${sName.replace(/\s+/g, '_')}_Generative_AI_Worksheet.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, logging: false },
                 jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
@@ -1135,22 +1270,20 @@
 
             showToast('Generating worksheet PDF...');
             html2pdf().set(opt).from(element).save().then(() => {
-                // Restore tabs
-                showTab('step1');
                 showToast('PDF downloaded successfully!');
             }).catch(err => {
                 console.error(err);
-                window.print(); // Fallback to browser print
+                window.print();
             });
         }
 
-        /* GOOGLE CLASSROOM LINK COPY */
+        /* CLASSROOM LINK COPY */
         function copySubmissionLink() {
             const sName = document.getElementById('studentName').value.trim() || 'Student';
             const sSec = document.getElementById('sectionSelect').value || 'Unassigned';
             const score = document.getElementById('totalScore').innerText;
 
-            const textToCopy = `DMES ICT Grade 7 - Generative AI Worksheet Submission\nStudent: ${sName} | Section: ${sSec}\nOverall Score: ${score}/100 pts\nStatus: Completed & Saved`;
+            const textToCopy = `DMES ICT Grade 7 - Generative AI Worksheet Submission\nStudent: ${sName} | Section: ${sSec}\nOverall Score: ${score}/100 pts\nAttached File: ${state.attachedFile ? state.attachedFile.name : 'None'}`;
 
             const el = document.createElement('textarea');
             el.value = textToCopy;
@@ -1159,11 +1292,15 @@
             document.execCommand('copy');
             document.body.removeChild(el);
 
-            showToast('Classroom summary copied to clipboard!');
+            showToast('Classroom submission copied to clipboard!');
         }
 
         window.onload = function() {
             recalculateScore();
+            // Start automatic timer on load
+            startAutomaticTimer();
+            // Initialize slide 1
+            goToTeachSlide(1);
         };
     </script>
 </body>
